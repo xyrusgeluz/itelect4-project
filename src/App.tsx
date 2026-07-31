@@ -1,7 +1,9 @@
+import {useState, useEffect, useRef} from "react";
+import type { User, Item } from "./types/index";
 import UserCard from "./components/UserCard";
 import ItemCard from "./components/ItemCard";
-import ClaimBadge from "./components/ClaimBadge";
-import type { User, Item, Claim } from "./types/index";
+import useToggle from "./hooks/useToggle";
+import usePrevious from "./hooks/usePrevious";
 
 const student: User = {
   id: 1,
@@ -21,22 +23,69 @@ const item: Item = {
   dateReported: new Date(),
 };
 
-const claim: Claim = {
-  id: 1,
-  itemId: item.id,
-  claimedBy: student.id,
-  submittedAt: new Date(),
-  score: 95,
-};
-
 function App() {
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [items, setItems] = useState<Item[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const [showDetails, toggleDetails] = useToggle(false);
+  const previousSearch = usePrevious(searchTerm);
+
+  useEffect(() => {
+    setTimeout(() => {
+      // Reusing our mock item as the "fetched" result
+      setItems([item]);
+      setIsLoading(false);
+    }, 500);
+  }, []);
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const focusSearch = (): void => {
+    searchInputRef.current?.focus();
+  };
+
+  const handleSearchChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => { setSearchTerm(e.target.value);
+  };
+
+  const filteredItems = items.filter((i) =>
+    i.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (isLoading) {
+    return <p>Loading items...</p>;
+  }
+
   return (
     <div className="app">
-      <UserCard user={student} onSelect={(u) => console.log(u)} />
-      <ItemCard item={item} />
-      <ClaimBadge claim={claim}>
-        <p>Verified by admin</p>
-      </ClaimBadge>
+      <input
+        ref={searchInputRef}
+        value={searchTerm}
+        type="text"
+        placeholder="Search items..."
+        onChange={handleSearchChange}
+      />
+
+      {previousSearch !== undefined && previousSearch !== searchTerm && (
+        <p>Previous search: "{previousSearch}"</p>
+      )}
+
+      <UserCard user={student} onSelect={setSelectedUser} />
+      {selectedUser && <p>Selected: {selectedUser.name}</p>}
+
+      <button onClick={toggleDetails}>
+        {showDetails ? "Hide" : "Show"} Details
+      </button>
+
+      {filteredItems.map((i) => (
+        <div key={i.id}>
+          <ItemCard item={i} />
+          {showDetails && <p>Reported on: {i.dateReported.toDateString()}</p>}
+        </div>
+      ))}
     </div>
   );
 }
