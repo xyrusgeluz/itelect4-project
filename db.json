@@ -1,0 +1,46 @@
+{
+  "items": [
+    {
+      "id": "1",
+      "title": "Black Umbrella",
+      "description": "Found near the library entrance, black with a wooden handle.",
+      "category": "accessories",
+      "status": "found",
+      "postedBy": 1,
+      "dateReported": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "title": "Blue Backpack",
+      "description": "Lost near the cafeteria. Has a keychain of a small bear.",
+      "category": "bags",
+      "status": "lost",
+      "postedBy": 1,
+      "dateReported": "2026-08-05T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "title": "Red Wallet",
+      "description": "Found in Room 301. Contains a student ID inside.",
+      "category": "accessories",
+      "status": "found",
+      "postedBy": 1,
+      "dateReported": "2026-08-10T00:00:00.000Z"
+    }
+  ],
+  "claims": [
+    {
+      "id": "1",
+      "itemId": 1,
+      "claimedBy": 1,
+      "submittedAt": "2026-08-03T09:00:00.000Z",
+      "score": 95
+    },
+    {
+      "id": "2",
+      "itemId": 3,
+      "claimedBy": 1,
+      "submittedAt": "2026-08-12T09:00:00.000Z"
+    }
+  ]
+}

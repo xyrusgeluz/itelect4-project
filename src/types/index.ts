@@ -74,3 +74,22 @@ export const enum Role {
   Student = "student",
   Admin = "admin",
 }
+
+// ===== SESSION 7: API TYPES =====
+// JSON has no Date, and json-server writes ids as strings. So what the
+// API hands back is NOT the Item/Claim shapes declared above.
+// Both types below are DERIVED with Omit, so Item and Claim stay the
+// single source of truth.
+
+export type ApiItem = Omit<Item, "id" | "dateReported"> & {
+  id: string;            // json-server ids are strings
+  dateReported: string;  // an ISO string, never a Date object
+};
+
+export type ApiClaim = Omit<Claim, "id" | "submittedAt"> & {
+  id: string;
+  submittedAt: string;
+};
+
+// What we SEND when creating a claim. No id — the server makes it.
+export type NewClaim = Omit<ApiClaim, "id">;
