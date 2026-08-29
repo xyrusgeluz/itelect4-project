@@ -1,6 +1,6 @@
 // src/pages/ItemsPage.tsx
 // Shows all lost & found items in a searchable grid.
-// Session 7: useQuery replaces the manual useState/useEffect fetch.
+// Session 8: Search input uses Shadcn UI Input.
 
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
@@ -9,15 +9,15 @@ import ItemCard from "../components/ItemCard";
 import usePrevious from "../hooks/usePrevious";
 import useUiStore from "../store/uiStore";
 import { fetchItems } from "../api/client";
+import { Input } from "@/components/ui/input";
 
 function ItemsPage() {
-  // These four lines replace ALL of Session 6's fetching state
   const { data, isPending, isError, error } = useQuery<ApiItem[]>({
     queryKey: ["items"],
     queryFn: fetchItems,
   });
 
-  // The search box now reads and writes the store, not local state
+  // The search box reads and writes the store
   const searchTerm = useUiStore((state) => state.searchTerm);
   const setSearchTerm = useUiStore((state) => state.setSearchTerm);
   const previousSearch = usePrevious(searchTerm);
@@ -46,11 +46,10 @@ function ItemsPage() {
         Items
       </h2>
 
-      <input
+      <Input
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Search items..."
-        className="w-full rounded border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
       />
 
       {previousSearch !== undefined && previousSearch !== searchTerm && (
