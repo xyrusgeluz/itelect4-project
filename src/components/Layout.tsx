@@ -1,16 +1,13 @@
-// src/components/Layout.tsx
-// Shared nav bar and page wrapper rendered by the root route.
-// Every child route renders inside the <Outlet /> below the nav.
-
 import { NavLink, Outlet } from "react-router";
-import useToggle from "../hooks/useToggle";
 import useAuthStore from "../store/authStore";
+import useUiStore from "../store/uiStore";
 
 function Layout() {
-  // Dark mode lives here so every page inherits it
-  const [isDarkMode, toggleDarkMode] = useToggle(false);
+  // WAS: const [isDarkMode, toggleDarkMode] = useToggle(false);
+  const isDarkMode  = useUiStore((state) => state.isDarkMode);
+  const toggleDarkMode = useUiStore((state) => state.toggleDarkMode);
   const userName = useAuthStore((state) => state.userName);
-  const logout = useAuthStore((state) => state.logout);
+  const logout   = useAuthStore((state) => state.logout);
 
   // Shared classes for every nav link, then the two state variants
   const base = "rounded px-3 py-1.5 text-sm";

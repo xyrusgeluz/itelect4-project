@@ -1,24 +1,33 @@
 // src/pages/ItemDetailPage.tsx
-// Reads the item id out of the URL with useParams and shows a detail view.
-// useNavigate() powers the Back button — called from inside an event handler.
+// Session 7: useQuery keyed by the item id from the URL.
 
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router";
+import type { ApiItem } from "../types/index";
 import ItemCard from "../components/ItemCard";
-import { allItems } from "../data/mockData";
+import { fetchItemById } from "../api/client";
 
 function ItemDetailPage() {
-  // Reads whatever is in the :id slot of the URL — always string | undefined
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Convert the URL string to a number to look up in the array
-  const item = allItems.find((i) => i.id === Number(id));
+  // The id from the URL goes INTO the key, so /items/1 and /items/2
+  // get one cache entry each instead of sharing one.
+  const { data, isPending, isError, error } = useQuery<ApiItem>({
+    queryKey: ["items", id],
+    queryFn: () => fetchItemById(id!),
+    enabled: id !== undefined,
+  });
 
-  // The URL is user input — they can type /items/banana. Handle it.
-  if (item === undefined) {
+  if (isPending) {
+    return <div className="animate-pulse p-6 text-gray-500">Loading item...</div>;
+  }
+
+  // A bad id makes fetchItemById throw, and the throw lands here.
+  if (isError) {
     return (
       <div className="rounded-lg bg-red-50 p-4 text-red-700">
-        No item found with id &quot;{id}&quot;.
+        {error.message}
       </div>
     );
   }
@@ -26,18 +35,17 @@ function ItemDetailPage() {
   return (
     <div>
       <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-        {item.title}
+        {data.title}
       </h2>
 
       <div className="max-w-sm">
-        <ItemCard item={item} variant="default" />
+        <ItemCard item={data} variant="default" />
       </div>
 
       <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-        Date reported: {item.dateReported.toDateString()}
+        Date reported: {data.dateReported}
       </p>
 
-      {/* useNavigate: called inside a handler, never in the component body */}
       <button
         onClick={() => navigate("/items")}
         className="mt-4 rounded bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700"

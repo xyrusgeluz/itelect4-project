@@ -1,8 +1,11 @@
 // src/data/mockData.ts
-// Shared mock data for the Lost & Found app.
-// Multiple pages need the same items and claims, so they live here.
+// allItems and allClaims are DELETED. They live in db.json now,
+// and the app fetches them instead of importing them.
+//
+// currentUser stays. There is no /users endpoint and no real login
+// until Module 4 — the Dashboard's user is still hard-coded, on purpose.
 
-import type { User, Item, Claim } from "../types/index";
+import type { User } from "../types/index";
 
 export const currentUser: User = {
   id: 1,
@@ -11,49 +14,3 @@ export const currentUser: User = {
   role: "student",
   isActive: true,
 };
-
-export const allItems: Item[] = [
-  {
-    id: 1,
-    title: "Black Umbrella",
-    description: "Found near the library entrance, black with a wooden handle.",
-    category: "accessories",
-    status: "found",
-    postedBy: 1,
-    dateReported: new Date("2026-08-01"),
-  },
-  {
-    id: 2,
-    title: "Blue Backpack",
-    description: "Lost near the cafeteria. Has a keychain of a small bear.",
-    category: "bags",
-    status: "lost",
-    postedBy: 1,
-    dateReported: new Date("2026-08-05"),
-  },
-  {
-    id: 3,
-    title: "Red Wallet",
-    description: "Found in Room 301. Contains a student ID inside.",
-    category: "accessories",
-    status: "found",
-    postedBy: 1,
-    dateReported: new Date("2026-08-10"),
-  },
-];
-
-export const allClaims: Claim[] = [
-  {
-    id: 1,
-    itemId: 1,
-    claimedBy: 1,
-    submittedAt: new Date("2026-08-03"),
-    score: 95,
-  },
-  {
-    id: 2,
-    itemId: 3,
-    claimedBy: 1,
-    submittedAt: new Date("2026-08-12"),
-  },
-];

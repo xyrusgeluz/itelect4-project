@@ -1,7 +1,7 @@
-import type { Claim } from "../types/index";
+import type { ApiClaim } from "../types/index";
 
 interface ClaimBadgeProps {
-  claim: Claim;
+  claim: ApiClaim;
   children?: React.ReactNode;
 }
 
@@ -12,7 +12,7 @@ const ClaimBadge: React.FC<ClaimBadgeProps> = ({ claim, children }) => {
         Claim #{claim.id}
       </p>
       <p className="text-sm text-gray-500 dark:text-gray-400">
-        Submitted: {claim.submittedAt.toDateString()}
+        Submitted: {claim.submittedAt}
       </p>
       <p className="text-sm text-gray-500 dark:text-gray-400">
         Score: {claim.score ?? "Not graded yet"}
