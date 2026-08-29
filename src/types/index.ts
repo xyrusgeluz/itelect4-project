@@ -24,6 +24,7 @@ export interface Claim {
   itemId: number;        // references an Item's id
   claimedBy: number;     // references a User's id
   submittedAt: Date;
+  proofUrl?: string;     // optional proof link
   score?: number;        // optional -- kept from Part 1 structure if needed later
 }
 
