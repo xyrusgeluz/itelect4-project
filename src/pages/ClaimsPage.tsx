@@ -49,14 +49,23 @@ function ClaimsPage() {
     },
   });
 
-  // handleSubmit only calls this after the schema passes
+// ===== SESSION 8: the page made up the other two fields ==============
+//   const onSubmit = (values: ClaimFormValues): void => {
+//     addClaim.mutate({
+//       itemId: Number(values.itemId),
+//       claimedBy: 1,
+//       submittedAt: new Date().toISOString(),
+//       proofUrl: values.proofUrl,
+//     });
+//   };
+//
+// NOTE: claimedBy was 1 for everybody, and the browser's clock set
+//       submittedAt. The API takes the owner off the token and the
+//       schema defaults the date, so sending either one is at best
+//       ignored. NewClaim is now exactly ClaimFormValues.
+// ===== SESSION 10: the two fields the form has, and nothing else =====
   const onSubmit = (values: ClaimFormValues): void => {
-    addClaim.mutate({
-      itemId: Number(values.itemId),
-      claimedBy: 1,
-      submittedAt: new Date().toISOString(),
-      proofUrl: values.proofUrl,
-    });
+    addClaim.mutate(values);
   };
 
   if (isPending) {

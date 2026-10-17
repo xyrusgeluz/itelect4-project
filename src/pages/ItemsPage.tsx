@@ -8,7 +8,7 @@ import type { ApiItem } from "../types/index";
 import ItemCard from "../components/ItemCard";
 import usePrevious from "../hooks/usePrevious";
 import useUiStore from "../store/uiStore";
-import { fetchItems } from "../api/client";
+import { fetchItems, API_URL } from "../api/client";
 import { Input } from "@/components/ui/input";
 
 function ItemsPage() {
@@ -26,10 +26,19 @@ function ItemsPage() {
     return <div className="animate-pulse p-6 text-gray-500">Loading items...</div>;
   }
 
+// ===== SESSIONS 7-8: the only thing that could be wrong was json-server
+//   if (isError) {
+//     return (
+//       <div className="rounded-lg bg-red-50 p-4 text-red-700">
+//         {error.message} — is json-server running on port 3001?
+//       </div>
+//     );
+//   }
+// ===== SESSION 10: name the host it actually tried ===================
   if (isError) {
     return (
       <div className="rounded-lg bg-red-50 p-4 text-red-700">
-        {error.message} — is json-server running on port 3001?
+        {error.message} — tried {API_URL}/api/items
       </div>
     );
   }

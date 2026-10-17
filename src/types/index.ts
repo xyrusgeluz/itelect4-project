@@ -25,7 +25,6 @@ export interface Claim {
   claimedBy: number;     // references a User's id
   submittedAt: Date;
   proofUrl?: string;     // optional proof link
-  score?: number;        // optional -- kept from Part 1 structure if needed later
 }
 
 // ===== TYPE ALIASES / UNIONS =====
@@ -87,10 +86,34 @@ export type ApiItem = Omit<Item, "id" | "dateReported"> & {
   dateReported: string;  // an ISO string, never a Date object
 };
 
-export type ApiClaim = Omit<Claim, "id" | "submittedAt"> & {
-  id: string;
-  submittedAt: string;
+// ===== SESSION 10: the same two types, matching the real API =======
+
+export type ApiClaim = Omit<Claim, "id" | "itemId" | "claimedBy" | "submittedAt"> & {
+  id: string;            // 24 hex characters, from MongoDB's _id
+  itemId: string;        // references an Item's _id
+  claimedBy: string;     // the owner's _id, also 24 hex characters
+  submittedAt: string;   // an ISO string, never a Date object
 };
 
-// What we SEND when creating a claim. No id — the server makes it.
-export type NewClaim = Omit<ApiClaim, "id">;
+// What we SEND when creating one. Not Omit<ApiClaim, "id"> any
+// more: the server fills in claimedBy from the token and submittedAt
+// from the schema default, so sending either one is at best ignored
+// and at worst a lie. These two fields are the whole request body,
+// and itelect4-backend's NewClaimBody is this same Pick.
+export type NewClaim = Pick<ApiClaim, "itemId"> & {
+  proofUrl?: string;
+};
+
+// What /api/auth/register sends back, and what sits inside the login
+// reply. Same story as ApiClaim: Session 1 said id was a number
+// because there was no database to number the rows.
+export type ApiUser = Omit<User, "id"> & {
+  id: string;
+};
+
+// What /api/auth/login sends back. The token is the string that goes
+// in the Authorization header on every request after this one.
+export interface AuthReply {
+  token: string;
+  user: ApiUser;
+}

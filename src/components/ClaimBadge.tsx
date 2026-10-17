@@ -14,9 +14,6 @@ const ClaimBadge: React.FC<ClaimBadgeProps> = ({ claim, children }) => {
       <p className="text-sm text-gray-500 dark:text-gray-400">
         Submitted: {claim.submittedAt}
       </p>
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        Score: {claim.score ?? "Not graded yet"}
-      </p>
       {children}
     </div>
   );

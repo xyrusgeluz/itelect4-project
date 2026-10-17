@@ -9,6 +9,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ItemsPage from "./pages/ItemsPage";
 import ItemDetailPage from "./pages/ItemDetailPage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import ClaimsPage from "./pages/ClaimsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
@@ -28,6 +29,9 @@ function App() {
 
         {/* /login — anyone can reach this */}
         <Route path="login" element={<LoginPage />} />
+
+        {/* Public, like login: you cannot be logged in yet. */}
+        <Route path="register" element={<RegisterPage />} />
 
         {/* ProtectedRoute: pathless guard; redirects to /login when token is null */}
         <Route element={<ProtectedRoute />}>

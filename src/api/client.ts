@@ -1,53 +1,127 @@
-// src/api/client.ts
-// Every call to json-server lives in this one file.
-// No component calls fetch directly any more.
+// ===== SESSION 7: a new file ========================================
+// ===== no Session 6 version -- nothing to compare it to =============
 
-import type { ApiItem, ApiClaim, NewClaim } from "../types/index";
+// src/api/client.ts -- the finished file
+// ===== SESSIONS 7-8: one hard-coded host, and no token anywhere ======
+// export const API_URL = "http://localhost:3001";
+//
+// export async function fetchItems(): Promise<ApiItem[]> {
+//   const res = await fetch(`${API_URL}/items`);
+//   if (!res.ok) {
+//     throw new Error("Could not load items");
+//   }
+//   return res.json();
+// }
+//
+// ... and then the same four lines again for each of the other three,
+// with a different guessed message each time.
+//
+// NOTE: Three things are wrong with that now. The host is written into
+// the code, so the deployed app would still call your laptop.
 
-export const API_URL = "http://localhost:3001";
+import type {
+  ApiItem,
+  ApiClaim,
+  NewClaim,
+  ApiUser,
+  AuthReply,
+} from "../types/index";
+import useAuthStore from "../store/authStore";
 
-// ── ITEMS ──────────────────────────────────────────────
+// Vite only exposes variables whose name starts with VITE_, and it
+// replaces this at BUILD time -- the value that was in .env when
+// `npm run build` ran is baked into the bundle. That is why adding it
+// in Vercel is not enough on its own: the next deploy is what picks it
+// up.
+export const API_URL = import.meta.env.VITE_API_URL;
 
-// GET /items -> the whole list
-export async function fetchItems(): Promise<ApiItem[]> {
-  const res = await fetch(`${API_URL}/items`);
+// The same guard db.ts has for MONGODB_URI, for the same reason: a
+// sentence now beats every call going to "undefined/api/items".
+if (!API_URL) {
+  throw new Error(
+    "VITE_API_URL is missing. Copy .env.example to .env, fill it in, " +
+      "and restart npm run dev.",
+  );
+}
+
+// Every call goes through here: the host, the JSON header, the token
+// when there is one, and the API's own message when it refuses.
+async function request<T>(
+  path: string,
+  init: RequestInit = {},
+): Promise<T> {
+  // getState(), not the useAuthStore hook -- this is not a component,
+  // and it does not need to re-render when the token changes. It only
+  // needs whatever the token is at the moment of the call.
+  const token = useAuthStore.getState().token;
+
+  const res = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      // The exact header requireAuth reads: the word Bearer, one
+      // space, then the token. No token in the store means no header
+      // at all, which is what the public item routes want.
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...init.headers,
+    },
+  });
+
   if (!res.ok) {
-    throw new Error("Could not load items");
+    // Every refusal this API sends has a message field. Reading it is
+    // the difference between "Could not save the claim" and
+    // "No item with that id".
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message ?? `Request failed (${res.status})`);
   }
+
   return res.json();
 }
 
-// GET /items/:id -> one item by its id
-export async function fetchItemById(id: string): Promise<ApiItem> {
-  const res = await fetch(`${API_URL}/items/${id}`);
-  if (!res.ok) {
-    throw new Error(`Could not load item "${id}"`);
-  }
-  return res.json();
+// ---- items: public. request() sends no token, and none is needed.
+
+export function fetchItems(): Promise<ApiItem[]> {
+  return request<ApiItem[]>("/api/items");
 }
 
-// ── CLAIMS ─────────────────────────────────────────────
-
-// GET /claims -> the whole list
-export async function fetchClaims(): Promise<ApiClaim[]> {
-  const res = await fetch(`${API_URL}/claims`);
-  if (!res.ok) {
-    throw new Error("Could not load claims");
-  }
-  return res.json();
+export function fetchItemById(id: string): Promise<ApiItem> {
+  return request<ApiItem>(`/api/items/${id}`);
 }
 
-// POST /claims -> the row the server saved, with the id it made
-export async function createClaim(
-  newClaim: NewClaim
+// ---- claims: private. The token goes on automatically.
+
+export function fetchClaims(): Promise<ApiClaim[]> {
+  return request<ApiClaim[]>("/api/claims");
+}
+
+export function createClaim(
+  newClaim: NewClaim,
 ): Promise<ApiClaim> {
-  const res = await fetch(`${API_URL}/claims`, {
+  return request<ApiClaim>("/api/claims", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(newClaim),
   });
-  if (!res.ok) {
-    throw new Error("Could not save the claim");
-  }
-  return res.json();
+}
+
+// ---- auth: the two routes that make a session exist
+
+export function registerUser(body: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<ApiUser> {
+  return request<ApiUser>("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export function loginUser(body: {
+  email: string;
+  password: string;
+}): Promise<AuthReply> {
+  return request<AuthReply>("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
