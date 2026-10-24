@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ClaimsPage from "./pages/ClaimsPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ReviewPage from "./pages/ReviewPage";
 
 function App() {
   return (
@@ -36,6 +37,8 @@ function App() {
         {/* ProtectedRoute: pathless guard; redirects to /login when token is null */}
         <Route element={<ProtectedRoute />}>
           <Route path="claims" element={<ClaimsPage />} />
+          {/* Session 11: AI Review page behind the same guard */}
+          <Route path="review" element={<ReviewPage />} />
         </Route>
 
         {/* Catch-all: no URL gives a blank page */}

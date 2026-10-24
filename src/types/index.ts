@@ -117,3 +117,14 @@ export interface AuthReply {
   token: string;
   user: ApiUser;
 }
+
+// ===== SESSION 11: what POST /api/ai sends back =======================
+// The shape that itelect4-backend's Review type produces.
+// Both repos declare this shape independently — nothing checks that
+// they agree except your code.
+export interface AiReview {
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+  readiness: "ready" | "almost" | "not-yet";
+}

@@ -1,46 +1,163 @@
-# ITELECT4 Project: Campus Lost & Found Tracker
+# Campus Lost & Found Tracker — Frontend (`itelect4-project`)
 
-## Project Concept
+Frontend single-page application (SPA) for the **Campus Lost & Found Tracker**, built with **React 19, TypeScript, Vite, Tailwind CSS v4, TanStack Query, Zustand**, and **React Hook Form with Zod**.
 
-This project is a simple backend model for a Campus Lost & Found Tracker. The idea is to help students and campus security keep track of items that have been lost or found around campus. A user can post an item they lost or found, and other users can submit a claim on that item. An admin then reviews the claim to verify if it is legit before the item is returned to its owner. This project focuses on the data structure and logic side of the app, using TypeScript to make sure every part of the data is properly typed and safe to work with.
+Part of **ITELECT4 (Web Development) — Graded Task 5 (GT5)** at De La Salle Lipa.
 
-## Entities and Types
+---
 
-The project defines the following interfaces and types in `types/index.ts`:
+## 🔗 Live Deployments & Repositories
 
-- **User**: represents a person using the app, either a student or an admin. Includes fields like id, name, email, role, and isActive.
-- **Item**: represents a lost or found post. Includes fields like id, title, description, category, status (lost or found), who posted it, and the date it was reported.
-- **Claim**: represents a user claiming an item as theirs. Includes fields like id, which item it refers to, who claimed it, and when it was submitted.
-- **ApiResponse\<T\>**: a generic interface used to wrap any kind of data response, along with a success flag and an optional message.
-- **UserUpdate**: a version of User where every field is optional, used for update forms.
-- **UserPreview**: a smaller version of User with only id, name, and role, used for lightweight lists.
-- **PublicUser**: a version of User safe to show publicly, with email and isActive removed.
-- **RoleCount**: a type used for counting how many users belong to each role.
-- **ClaimStatus**: an enum representing the lifecycle of a claim, from Pending to Verified to Rejected.
-- **Role**: a const enum representing the two possible user roles, student and admin.
+| Component | URL |
+|---|---|
+| **Live Frontend App** | [https://itelect4-project-six.vercel.app](https://itelect4-project-six.vercel.app) |
+| **Live Backend API** | [https://itelect4-backend-lovat.vercel.app](https://itelect4-backend-lovat.vercel.app) |
+| **Frontend Repository** | [https://github.com/xyrusgeluz/itelect4-project](https://github.com/xyrusgeluz/itelect4-project) |
+| **Backend Repository** | [https://github.com/xyrusgeluz/itelect4-backend](https://github.com/xyrusgeluz/itelect4-backend) |
 
-## TypeScript Concepts Used
+---
 
-This project applies the following TypeScript concepts:
+## 🚀 Features
 
-- Type annotations for variables, function parameters, and return values
-- Primitive types such as string, number, boolean, null, undefined, and void
-- Special types such as any, unknown, and never
-- Interfaces to define the shape of objects
-- Type aliases and union types
-- Type narrowing using typeof
-- Generic functions and a generic interface
-- Utility types such as Partial, Pick, Omit, Record, and ReturnType
-- Enums, both a regular enum and a const enum
+- **Authentication & Protected Routing**:
+  - Login & Register pages validated with **React Hook Form** and **Zod** (`authSchema`).
+  - Auth token and session persisted in `localStorage` via **Zustand** (`authStore`).
+  - `ProtectedRoute` wrapper guarding sensitive routes (`/claims`, `/review`).
+- **Interactive Items Catalog**:
+  - Filter and search lost and found items in real-time.
+  - Search state synchronized through `uiStore`.
+  - Item detail pages dynamically fetched via **TanStack Query**.
+- **Claims Management**:
+  - Users can submit claims for lost items with validated proof URLs (Google Drive, Imgur, Dropbox, GitHub).
+  - Uses TanStack Query `useMutation` with automatic query invalidation.
+- **AI Review Assistant (`/review`)**:
+  - Dedicated page allowing students to submit detailed lost/found descriptions for automated AI evaluation.
+  - Form validation with Zod (`reviewFormSchema`) checking character boundaries (20–2000 chars) before making requests.
+  - Uses `useMutation` to post to the backend's `/api/ai` endpoint (the frontend never communicates with Gemini directly).
+  - Dynamic UI rendering:
+    - Color-coded status badge (`ready` in green, `almost` in yellow, `not-yet` in red).
+    - AI-generated summary sentence.
+    - Bulleted lists for **Strengths** and **Suggested Improvements**.
+- **Dark Mode Support**:
+  - Dark mode state managed by Zustand (`uiStore`) and persisted in `localStorage`.
 
-## How to Install and Run
+---
 
-1. Clone the repository.
-2. Open a terminal inside the project folder.
-3. Run `npm install` to install all dependencies.
-4. Run `npx tsc --noEmit` to check that the project compiles with no errors.
-5. Run `npx ts-node src/index.ts` to run the project and see the sample output in the terminal.
+## 🛠️ Tech Stack
 
-## Notes
+- **Framework**: React 19, Vite 8
+- **Language**: TypeScript
+- **State Management**:
+  - **Server State**: `@tanstack/react-query` (fetching, mutations, caching)
+  - **Client State**: `zustand` with `persist` middleware (auth & UI preferences)
+- **Forms & Validation**: `react-hook-form`, `zod`, `@hookform/resolvers`
+- **Styling**: `tailwindcss` v4 (with `@tailwindcss/vite`), `clsx`, `tailwind-merge`, `class-variance-authority`
+- **UI Components**: Shadcn-style components (`button`, `input`, `label`), Lucide icons (`lucide-react`)
+- **Routing**: `react-router` v8
 
-This is part of GT1 for ITELECT4. The User, Item, and Claim entities and their related types are the foundation that future graded tasks in this course will build on top of.
+---
+
+## 📁 Folder Structure
+
+```
+itelect4-project/
+├── src/
+│   ├── api/
+│   │   └── client.ts         # Central fetch wrapper with Bearer token injection & askAi()
+│   ├── components/
+│   │   ├── ui/               # Reusable UI primitives (button, input, label)
+│   │   ├── ClaimBadge.tsx    # Claim status badge
+│   │   ├── ItemCard.tsx      # Lost/found item card
+│   │   ├── Layout.tsx        # App navbar & layout container with dark mode toggle
+│   │   ├── ProtectedRoute.tsx# Route guard checking token in authStore
+│   │   └── UserCard.tsx      # User profile card
+│   ├── hooks/
+│   │   ├── usePrevious.ts    # Custom hook tracking previous state
+│   │   └── useToggle.ts      # Custom toggle hook
+│   ├── pages/
+│   │   ├── ClaimsPage.tsx    # Protected claims submission & list
+│   │   ├── DashboardPage.tsx # User dashboard
+│   │   ├── ItemDetailPage.tsx# Single item view
+│   │   ├── ItemsPage.tsx     # Searchable grid of lost & found items
+│   │   ├── LoginPage.tsx     # Login form
+│   │   ├── NotFoundPage.tsx  # 404 handler
+│   │   ├── RegisterPage.tsx  # User registration form
+│   │   └── ReviewPage.tsx    # Protected AI Review page (Session 11)
+│   ├── schemas/
+│   │   ├── authSchema.ts     # Zod login & registration schemas
+│   │   ├── claimSchema.ts    # Zod claim validation schema
+│   │   └── reviewSchema.ts   # Zod AI review input schema
+│   ├── store/
+│   │   ├── authStore.ts      # Zustand auth state (token, userName) with persist
+│   │   └── uiStore.ts        # Zustand UI state (darkMode, searchTerm) with persist
+│   ├── types/
+│   │   └── index.ts          # Shared TypeScript interfaces (Item, User, Claim, AiReview)
+│   ├── App.tsx               # Client route configuration
+│   ├── main.tsx              # React root entry point
+│   └── index.css             # Tailwind CSS styles
+├── package.json
+├── vite.config.ts
+└── tsconfig.json
+```
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the root of `itelect4-project`:
+
+```env
+# For local development with itelect4-backend running on port 4000:
+VITE_API_URL=http://localhost:4000
+
+# For production deployment pointing to the deployed API:
+# VITE_API_URL=https://itelect4-backend-lovat.vercel.app
+```
+
+> **Note**: Vite bakes `VITE_*` variables into the JavaScript bundle at build time. Whenever you change this variable, restart the Vite dev server or trigger a new build.
+
+---
+
+## 💻 Local Installation & Setup
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/xyrusgeluz/itelect4-project.git
+   cd itelect4-project
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment**:
+   ```bash
+   # Ensure VITE_API_URL points to your running backend
+   echo "VITE_API_URL=http://localhost:4000" > .env
+   ```
+
+4. **Start development server**:
+   ```bash
+   npm run dev
+   # App runs on http://localhost:5173
+   ```
+
+5. **Typecheck & Production Build**:
+   ```bash
+   npm run build
+   ```
+
+---
+
+## 🤖 AI Review Integration (Session 11)
+
+The `/review` page uses the backend's `/api/ai` endpoint to provide automated feedback on item reports:
+1. Student enters a description (20–2000 characters).
+2. The browser validates with Zod (`reviewFormSchema`).
+3. `askAi()` sends an authenticated `POST` request with the user's Bearer token.
+4. The backend coordinates with **Google Gemini Flash**, enforces a structured schema, and returns four typed fields:
+   - `summary`: One sentence restating what was reported.
+   - `strengths`: Well-articulated details that will aid recovery.
+   - `improvements`: Missing information to add before posting.
+   - `readiness`: Overall readiness badge (`ready`, `almost`, or `not-yet`).
