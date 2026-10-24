@@ -36,6 +36,9 @@ function Layout() {
           <NavLink to="/claims" className={linkClass}>
             Claims
           </NavLink>
+          <NavLink to="/review" className={linkClass}>
+            AI Review
+          </NavLink>
 
           {/* Show Login when logged out, Logout button when logged in */}
           {userName === null ? (
