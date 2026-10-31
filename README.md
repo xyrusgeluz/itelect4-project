@@ -1,3 +1,5 @@
+[![CI](https://github.com/xyrusgeluz/itelect4-project/actions/workflows/ci.yml/badge.svg)](https://github.com/xyrusgeluz/itelect4-project/actions/workflows/ci.yml)
+
 # Campus Lost & Found Tracker — Frontend (`itelect4-project`)
 
 Frontend single-page application (SPA) for the **Campus Lost & Found Tracker**, built with **React 19, TypeScript, Vite, Tailwind CSS v4, TanStack Query, Zustand**, and **React Hook Form with Zod**.
